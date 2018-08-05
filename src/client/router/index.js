@@ -17,22 +17,15 @@ var router = new Router({
     mode: 'history',
     routes: [
         {
-            path: '/blog',
-            component: Blog,
-            children: [
-                {path: '', component: BlogIndex},
-                {path: 'pic', component: PicIndex},
-            ]
+            path: '/main',
+            component: (resolve) => require(['./../components/pages/FindFun.vue'], resolve),
+            // children:[
+            //     {path: 'idip', component: (resolve) => require(['./../components/Hello.vue'], resolve)},
+            //     {path: 'b', component: (resolve) => require(['./../components/Blog.vue'], resolve)},
+            // ]
         },
-        {
-            path: '/tools',
-            component: (resolve) => require(['./../components/Tools.vue'], resolve),
-            children:[
-                {path: 'idip', component: (resolve) => require(['./../components/tool/idip.vue'], resolve)},
-                {path: '', component: (resolve) => require(['./../components/tool/toolTest.vue'], resolve)},
-            ]
-        },
-        {path: '*', component: page404}
+        {path: '/v',name:"v", component: (resolve) => require(['./../components/pages/Article.vue'], resolve)},
+        {path: '*', component: (resolve) => require(['./../components/Hello.vue'], resolve)}
     ]
 })
 
