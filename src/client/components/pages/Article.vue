@@ -12,13 +12,25 @@
 
                 <div style="min-height: 200px;">
                     <Card>
-                        <img v-for="(item, index) in list" :src="item" width="100%" :class="(index==list.length-1 && flag)?'bg-blur':''">
+                        <img v-for="(item, index) in list" :src="item" width="100%" :class="(index==list.length-1 && showFlag)?'bg-blur':''">
 
                     </Card>
 
-                    <Button v-show="flag" class="btn" type="primary" @click="flag=false" >
+                    <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true" >
                         阅读更多
                     </Button>
+
+                    <Modal
+                            v-model="modalFlag"
+                            title="請支持我們的網站，您的每一筆捐贈都會用於服務器建設"
+                            @on-ok="ok" >
+                        <p>二維碼</p>
+                        <p>二維碼</p>
+                        <p>二維碼</p>
+                        <div slot="footer">
+                            <Button type="dashed" size="large" long @click="modalFlag=false" >我沒有感情</Button>
+                        </div>
+                    </Modal>
 
 
                 </div>
@@ -43,7 +55,8 @@
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                 ],
-                flag:true
+                showFlag:true,
+                modalFlag:false
             }
         },
         computed: {},
@@ -67,15 +80,6 @@
     }
 
 
-
-    .bg {
-        width: 100%;
-        min-height: 10px;
-        background-image: url('http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg');
-        filter:blur(0px);
-        color:#fff;
-    }
-
     .bg-blur{
         -webkit-filter: blur(5px) contrast(.8) brightness(.8);
         -moz-filter: blur(5px);
@@ -90,9 +94,9 @@
         display: block;
         bottom: 10%;
         left: 45%;
-        width: 10%;
+        min-width: 10%;
         height: 50px;
-        font-size:1.5em;
+        font-size:1.2em;
         -webkit-transform:translateY(-50%);
     }
 
