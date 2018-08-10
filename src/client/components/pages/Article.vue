@@ -12,29 +12,29 @@
 
                 <div style="min-height: 200px;">
                     <Card>
-                        <img v-for="(item, index) in list" :src="item" width="100%" :class="(index==list.length-1 && showFlag)?'bg-blur':''">
+                        <img v-for="(item, index) in list" :src="item" width="100%"
+                             :class="(index==list.length-1 && showFlag)?'bg-blur':''">
 
                     </Card>
 
-                    <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true" >
+                    <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true">
                         阅读更多
                     </Button>
 
                     <Modal
                             v-model="modalFlag"
                             title="請支持我們的網站，您的每一筆捐贈都會用於服務器建設"
-                            @on-ok="ok" >
+                    >
                         <p>二維碼</p>
                         <p>二維碼</p>
                         <p>二維碼</p>
                         <div slot="footer">
-                            <Button type="dashed" size="large" long @click="modalFlag=false" >我沒有感情</Button>
+                            <Button type="dashed" size="large" long @click="modalFlag=false">我沒有感情</Button>
                         </div>
                     </Modal>
 
 
                 </div>
-
 
 
             </Content>
@@ -55,13 +55,47 @@
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                 ],
-                showFlag:true,
-                modalFlag:false
+                showFlag: true,
+                modalFlag: false
             }
         },
         computed: {},
         mounted: function () {
-            console.log(this.$route.query)
+            this.aid = this.$route.query.id
+
+            this.getUserInfo()
+
+            this.getArticle()
+        },
+        methods: {
+            getArticle: function () {
+
+                this.$axios.get('/api/getArticle', {
+                    params: {
+                        id: this.aid,
+                        ua: this.ua
+                    }
+                })
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            },
+            getUserInfo: function () {
+                let ua = localStorage.getItem("ua")
+                if (!ua) {
+                    ua = btoa(navigator.userAgent).substr(0, 10)
+                    let tmp = new Date().getTime()
+                    ua = Math.ceil(parseInt(ua, 36) * Math.random()).toString(36) + tmp.toString(36)
+                    ua=ua.toUpperCase()
+                    localStorage.setItem("ua", ua)
+                }
+                this.ua = ua
+                console.log(ua)
+            }
         }
     }
 </script>
@@ -79,8 +113,7 @@
         text-align: center;
     }
 
-
-    .bg-blur{
+    .bg-blur {
         -webkit-filter: blur(5px) contrast(.8) brightness(.8);
         -moz-filter: blur(5px);
         -o-filter: blur(5px);
@@ -89,17 +122,16 @@
         transition: 1.0s filter;
     }
 
-    .btn{
+    .btn {
         position: absolute;
         display: block;
         bottom: 10%;
         left: 45%;
         min-width: 10%;
         height: 50px;
-        font-size:1.2em;
-        -webkit-transform:translateY(-50%);
+        font-size: 1.2em;
+        -webkit-transform: translateY(-50%);
     }
-
 
 
 </style>

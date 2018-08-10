@@ -15,8 +15,10 @@ router.get('/', function(req, res, next) {
     res.send('ok')
 });
 
-router.get('/test', function(req, res, next) {
-    res.send('test')
+router.get('/getArticle', function(req, res, next) {
+    let id = req.query.id
+
+    res.send(id)
 });
 
 router.get('/save', function (req, res, next) {
