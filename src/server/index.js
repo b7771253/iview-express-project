@@ -20,17 +20,6 @@ import config from '../../build/webpack.dev.conf'
 
 const app = express()
 
-const mongoose = require('mongoose')
-
-// 连接mongodb
-// mongoose.connect('mongodb://leoric:test@119.28.88.83:27017/test') //test是数据库名称
-// // 实例化连接对象
-// const db = mongoose.connection
-// db.on('error', console.error.bind(console, '连接错误：'))
-// db.once('open', (callback) => {
-//     console.log('MongoDB连接成功！！')
-// })
-
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'))
 // app.set('view engine', 'jade')
