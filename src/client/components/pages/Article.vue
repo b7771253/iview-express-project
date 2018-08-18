@@ -3,15 +3,100 @@
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="dark" active-name="1">
+                    <MenuItem name="1">
+                        <Icon type="md-person" />
+                        <span>{{ua}}</span>
+                        <Button type="primary" @click="uaEditFlag=true">修改</Button>
+                        <Modal
+                                v-model="uaEditFlag"
+                                title="修改您的用戶標誌"
+                        >
+                            <Input v-model="ua" />
+                            <div slot="footer">
+                                <Button type="primary" size="large" long @click="uaEditFlag=false;saveUserInfo()">確定</Button>
+                            </div>
+                        </Modal>
+
+
+                    </MenuItem>
+
+                    <i-switch  size="large" v-if="isAdmin==99" v-model="isEdit" >
+                        <span slot="open">编辑</span>
+                        <span slot="close">预览</span>
+                    </i-switch>
+
+
                 </Menu>
             </Header>
-            <Content :style="{padding: '0 50px'}">
+            <Content :style="{padding: '0 50px'}" v-if="isEdit">
+                <br>
+                <h2>編輯模式</h2>
+                <br>
+               <h3>標題 ：<Input style="width: auto" v-model="title"/></h3>
+                <br>
+
+                <h3>正文 ： </h3>
+
+                <br>
+                <div  v-for="(item,index) in data1">
+                    <i-input v-model="item.content"  >
+                        <Select v-model="item.type" slot="prepend" style="width: 80px">
+                            <Option value="0">文字</Option>
+                            <Option value="1">圖片</Option>
+                        </Select>
+                        <Button  slot="append" @click="data1.splice(index,1)"> - </Button>
+
+                    </i-input>
+                    <br>
+                </div>
+                <Button @click="data1.push({type:0,content:''})"> + </Button>
+
+
+                <br><br><br>
+
+                <h3>隱藏部分 ： </h3>
+                <br>
+
+                <div  v-for="(item,index) in data2">
+                    <i-input v-model="item.content"  >
+                        <Select v-model="item.type" slot="prepend" style="width: 80px">
+                            <Option value="0">文字</Option>
+                            <Option value="1">圖片</Option>
+                            <Option value="2">種子</Option>
+                        </Select>
+                        <Button  slot="append" @click="data2.splice(index,1)"> - </Button>
+
+                    </i-input>
+                    <br>
+                </div>
+                <Button @click="data2.push({type:0,content:''})"> + </Button>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+
+
+                <Button long type="success" @click="save()"> 提交 </Button>
+
+
+                <br>
+
+
+            </Content>
+            <Content :style="{padding: '0 50px'}" v-if="!isEdit">
                 <Breadcrumb :style="{margin: '20px 0'}">
                     <BreadcrumbItem>{{title}}</BreadcrumbItem>
                 </Breadcrumb>
 
+
+
+
                 <div style="min-height: 200px;">
+
                     <Card>
+
+
                         <img v-for="(item, index) in list" :src="item" width="100%"
                              :class="(index==list.length-1 && showFlag)?'bg-blur':''">
 
@@ -49,14 +134,20 @@
         name: "v",
         data() {
             return {
+                uaEditFlag:false,
+                ua:"",
                 title: "标题",
+                data1:[],
+                data2:[],
                 list: [
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                     "http://game.gtimg.cn/images/hdl/cp/a20180731bbzt/bg3.jpg",
                 ],
                 showFlag: true,
-                modalFlag: false
+                modalFlag: false,
+                isEdit:false,
+                isAdmin:0,
             }
         },
         computed: {},
@@ -70,6 +161,8 @@
         methods: {
             getArticle: function () {
 
+                let v = this
+
                 this.$axios.get('/api/getArticle', {
                     params: {
                         id: this.aid,
@@ -78,6 +171,8 @@
                 })
                     .then(function (response) {
                         console.log(response);
+                        v.isAdmin = response.data.code
+
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -95,6 +190,9 @@
                 }
                 this.ua = ua
                 console.log(ua)
+            },
+            saveUserInfo:function () {
+                localStorage.setItem("ua", this.ua)
             }
         }
     }

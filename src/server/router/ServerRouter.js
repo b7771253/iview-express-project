@@ -9,8 +9,6 @@ let connection = mysql.createConnection({
     database : 'test',
     port:'62166'
 });
-
-
 connection.connect();
 
 
@@ -19,53 +17,75 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/getArticle', function(req, res, next) {
-    let aid = req.query.id
+
+
+    let aid = parseInt(req.query.id)
     let ua = req.query.ua
 
-    if (!aid || !ua){
+    if (!aid || !ua ||  !(/^[0-9a-zA-Z]+$/.test(ua))  ){
         res.send({code:-1})
         return;
     }
 
-    let sql = 'SELECT id FROM user where ua=?'
-    let param = [ua]
+    connection.query("SELECT * FROM article WHERE id = ?",[aid],function (error, results) {
 
-
-    connection.query(sql, param ,function (error, results) {
-
-        if (error) {
-            res.send({code:-2})
+        if (error || !results[0] ){
+            console.log(results,"============")
+            res.send({code: -1})
             return;
         }
 
-        if (!results[0] || !results[0].id){
-            sql = 'INSERT INTO user VALUES(?,null)'
-            param = [ua]
-            connection.query(sql, param,null)
-            res.send({code:1,data:ua})
-            return
-        }
+        let content = JSON.parse(results[0].content)
+        let title = results[0].title
 
-        let  uid= results[0].id
+        let sql = 'SELECT id,type FROM user where ua=?'
+        let param = [ua]
 
-        sql = 'SELECT * FROM user where uid=? and aid=?'
-        param = [uid,aid]
+        connection.query(sql, param, function (error, results) {
 
-        connection.query(sql, param,function (error, results) {
-
-            if (error || !results[0] || !results[0].id) {
-                res.send({code:-5,data:uid})
+            if (error) {
+                res.send({code: -2,title:title,data1:content.data1})
                 return;
             }
 
-            res.send({code:0})
+            if (!results[0] || !results[0].id) {
+                sql = 'INSERT INTO user VALUES(?,null)'
+                param = [ua]
+                connection.query(sql, param, null)
+                res.send({code: -3,title:title,data1:content.data1})
+                return
+            }
 
-        })
+            if (results[0].type==99){
+                res.send({code: 99,title:title,data1:content.data1,data2:content.data2})
+                return
+            }
+
+            let uid = results[0].id
+
+            sql = 'SELECT * FROM article_ref where uid=? and aid=?'
+            param = [uid, aid]
+
+            console.log(uid,aid," ========== ")
+
+            connection.query(sql, param, function (error, results) {
+
+                if (error || !results[0] || !results[0].aid) {
+                    res.send({code: -5,title:title,data1:content.data1})
+                    return;
+                }
+
+                res.send({code: 0,title:title,data1:content.data1,data2:content.data2})
+
+            })
+
+        });
 
     });
 
-
 });
+
+
 
 // var nodemailer = require('nodemailer');
 // var transporter = nodemailer.createTransport({
