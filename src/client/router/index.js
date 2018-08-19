@@ -18,6 +18,7 @@ var router = new Router({
     routes: [
         {
             path: '/main',
+            name:"index",
             component: (resolve) => require(['./../components/pages/FindFun.vue'], resolve),
             // children:[
             //     {path: 'idip', component: (resolve) => require(['./../components/Hello.vue'], resolve)},

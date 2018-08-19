@@ -28,12 +28,12 @@
                             border
                             :loading="loading"
                            :columns="columns1"
-                           :data="data1"
+                           :data="titleList"
                            @on-row-click="click"
                     ></Table>
                 </div>
 
-                <Page :total="1000" style="padding: 2em"/>
+                <Page :total="total" @on-change="choosePage" style="padding: 2em"/>
 
             </Content>
 
@@ -45,50 +45,51 @@
     export default {
         data() {
             return {
+                page:1,
                 loading: false,
                 columns1: [
                     {
                         title: '标题',
-                        key: 'name',
-                    },
-                    {
-                        title: '上传时间',
-                        key: 'age',
-                        maxWidth:100
+                        key: 'title',
                     }
                 ],
-                data1: [
-                    {
-                        name: 'John Brown',
-                        age: 18,
-                        address: 'New York No. 1 Lake Park',
-                        date: '2016-10-03'
-                    },
-                    {
-                        name: 'Jim Green',
-                        age: 24,
-                        address: 'London No. 1 Lake Park',
-                        date: '2016-10-01'
-                    },
-                    {
-                        name: 'Joe Black',
-                        age: 30,
-                        address: 'Sydney No. 1 Lake Park',
-                        date: '2016-10-02'
-                    },
-                    {
-                        name: 'Jon Snow',
-                        age: 26,
-                        address: 'Ottawa No. 2 Lake Park',
-                        date: '2016-10-04'
-                    }
-                ]
+                titleList: [],
+                total:0,
             }
+        },
+        mounted:function(){
+          this.getTitleList()
+        },
+        computed:{
+
         },
         methods:{
             click:function (data,index) {
                 console.log(data,index)
-                this.$router.push({name: 'v',query:{ id:'1'}});
+
+                this.$router.push({name: 'v',query:{ id:data.id}});
+            },
+            getTitleList:function () {
+                let v =this
+                this.$axios.get('/api/getTitleList', {
+                    params: {
+                        page: this.page
+                    }
+                })
+                    .then(function (response) {
+                        console.log(response);
+                        v.titleList = response.data.list
+                        v.total = response.data.total
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            },
+            choosePage:function (n) {
+                console.log(n)
+                this.page = n
+                this.getTitleList()
             }
         }
     }
