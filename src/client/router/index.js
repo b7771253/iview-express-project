@@ -2,13 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 // 导入对应的vuex文件
-import store from './../store/store'
+// import store from './../store/store'
 
 // 导入相应的子组件
-import Blog from './../components/Blog'
-import page404 from './../components/404'
-import BlogIndex from './../components/pages/BlogIndex'
-import PicIndex from './../components/pages/PicIndex'
 
 Vue.use(Router)
 //Vue.use(store)

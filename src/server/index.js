@@ -12,9 +12,7 @@ import APIRouter from './router/ServerRouter'
 // 引入history模块
 import history from 'connect-history-api-fallback'
 
-// 正式环境时，下面两个模块不需要引入
-import webpackDevMiddleware from 'webpack-dev-middleware'
-import webpackHotMiddleware from 'webpack-hot-middleware'
+
 
 import config from '../../build/webpack.dev.conf'
 
@@ -26,21 +24,21 @@ const app = express()
 
 
 //https
-import fs from 'fs';
+// import fs from 'fs';
 let http = require('http');
-let https = require('https');
-let privateKey  = fs.readFileSync('./config/private.pem', 'utf8');
-let certificate = fs.readFileSync('./config/file.crt', 'utf8');
-let credentials = {key: privateKey, cert: certificate};
+// let https = require('https');
+// let privateKey  = fs.readFileSync('./config/private.pem', 'utf8');
+// let certificate = fs.readFileSync('./config/file.crt', 'utf8');
+// let credentials = {key: privateKey, cert: certificate};
 
 let httpServer = http.createServer(app);
-let httpsServer = https.createServer(credentials, app);
-httpServer.listen(80, function() {
-    console.log('HTTP Server is running on: http://localhost:%s', 80);
+// let httpsServer = https.createServer(credentials, app);
+httpServer.listen(81, function() {
+    console.log('HTTP Server is running on: http://localhost:%s', 81);
 });
-httpsServer.listen(443, function() {
-    console.log('HTTPS Server is running on: https://localhost:%s', 443);
-});
+// httpsServer.listen(443, function() {
+//     console.log('HTTPS Server is running on: https://localhost:%s', 443);
+// });
 
 // 引入history模式让浏览器支持
 // app.use(history())
@@ -63,12 +61,14 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
+// 正式环境时，下面两个模块不需要引入
+import webpackDevMiddleware from 'webpack-dev-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware'
 const compiler = webpack(config)
 app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath,
     stats: {colors: true}
 }))
-
 app.use(webpackHotMiddleware(compiler))
 
 
