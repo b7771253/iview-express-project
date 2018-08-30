@@ -27,11 +27,12 @@
                     <Table
                             border
                             :loading="loading"
-                           :columns="columns1"
-                           :data="titleList"
-                           @on-row-click="click"
+                            :columns="columns1"
+                            :data="titleList"
+                            @on-row-click="click"
                     ></Table>
                 </div>
+
 
                 <Page :total="total" @on-change="choosePage" style="padding: 2em"/>
 
@@ -45,7 +46,7 @@
     export default {
         data() {
             return {
-                page:1,
+                page: 1,
                 loading: false,
                 columns1: [
                     {
@@ -54,23 +55,24 @@
                     }
                 ],
                 titleList: [],
-                total:0,
+                total: 0,
             }
         },
-        mounted:function(){
-          this.getTitleList()
+        mounted: function () {
+            this.getTitleList()
         },
-        computed:{
+        computed: {},
+        methods: {
+            click: function (data, index) {
+                console.log(data, index)
 
-        },
-        methods:{
-            click:function (data,index) {
-                console.log(data,index)
-
-                this.$router.push({name: 'v',query:{ id:data.id}});
+                this.$router.push({name: 'v', query: {id: data.id}});
             },
-            getTitleList:function () {
-                let v =this
+            getTitleList: function () {
+
+                let v = this
+                v.loading = true
+
                 this.$axios.get('/api/getTitleList', {
                     params: {
                         page: this.page
@@ -80,13 +82,17 @@
                         console.log(response);
                         v.titleList = response.data.list
                         v.total = response.data.total
+                        v.loading = false
+
                     })
                     .catch(function (error) {
                         console.log(error);
+                        v.loading = false
+
                     });
 
             },
-            choosePage:function (n) {
+            choosePage: function (n) {
                 console.log(n)
                 this.page = n
                 this.getTitleList()
