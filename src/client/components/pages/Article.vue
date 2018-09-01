@@ -37,7 +37,7 @@
 
 
             </Header>
-            <div  class="demo-spin-container">
+            <div class="demo-spin-container">
                 <Content :style="{padding: '0 50px'}" v-if="isEdit">
                     <br>
                     <h2>編輯模式</h2>
@@ -82,9 +82,14 @@
                     <Button @click="data2.push({type:0,content:''})"> +</Button>
                     <br>
                     <br>
+
+                    <h3>價格 ： </h3>
+                    <i-input v-model="price"></i-input>
                     <br>
                     <br>
                     <br>
+                    <br>
+
 
 
                     <Button long type="success" :loading="saveLoading" @click="save()"> 提交</Button>
@@ -126,18 +131,24 @@
 
                         </Card>
 
-                        <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true">
+                        <Button v-show="showFlag" class="btn" type="primary" @click="showPay()">
                             阅读更多
                         </Button>
 
                         <Modal
+                                width="400px"
                                 v-model="modalFlag"
                                 title="請支持我們的網站，您的每一筆捐贈都會用於服務器建設"
                         >
-                            <p>二維碼</p>
-                            <p>二維碼</p>
-                            <p>二維碼</p>
+                            <div class="title">
+                                    <img :src="payImg" style="width: 100%;"/>
+                            </div>
+
                             <div slot="footer">
+                                <br>
+                                <Button type="success" size="large" long @click="modalFlag=false;getArticle">我已經支付</Button>
+                                <br>
+                                <br>
                                 <Button type="dashed" size="large" long @click="modalFlag=false">我沒有感情</Button>
                             </div>
                         </Modal>
@@ -147,7 +158,7 @@
 
 
                 </Content>
-                <Spin fix size="large"  v-if="loading"></Spin>
+                <Spin fix size="large" v-if="loading"></Spin>
             </div>
 
             <br>
@@ -174,6 +185,9 @@
                 modalFlag: false,
                 isEdit: false,
                 isAdmin: 0,
+                payImg: "",
+                payData: {},
+                price:0,
             }
         },
         computed: {},
@@ -212,6 +226,8 @@
                         v.isAdmin = response.data.code
                         v.data1 = response.data.data1
                         v.data2 = response.data.data2
+                        v.payData = response.data.sig
+                        v.price = v.payData.price
                         if (v.data2) {
                             v.showFlag = false
                         }
@@ -248,7 +264,8 @@
                     ua: this.ua,
                     data1: this.data1,
                     data2: this.data2,
-                    title: this.title
+                    title: this.title,
+                    price:this.price,
                 })
                     .then(function (response) {
                         console.log(response);
@@ -279,12 +296,34 @@
                     });
 
             },
+            showPay: function () {
+                let v = this
+                this.$axios.post('/api/pay', this.payData)
+                    .then(function (response) {
+                        console.log(response);
+                        v.modalFlag = true
+                        v.payImg = response.data.info.qrcode
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+            }
 
         }
     }
 </script>
 
 <style scoped>
+
+    .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .title img {
+        width: 35%;
+    }
     .layout {
         border: 1px solid #d7dde4;
         background: #f5f7f9;
@@ -316,7 +355,8 @@
         font-size: 1.2em;
         -webkit-transform: translateY(-50%);
     }
-    .demo-spin-container{
+
+    .demo-spin-container {
         display: inline-block;
         min-height: 400px;
         position: relative;

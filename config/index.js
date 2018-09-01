@@ -27,7 +27,15 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+        '/shopping':{//此处并非一定和url一致。
+            target:'https://mainsite-restapi.ele.me/shopping',
+            changeOrigin:true,//允许跨域
+            pathRewrite:{
+                '^/shopping': ''
+            }
+        }
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

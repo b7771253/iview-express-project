@@ -7,7 +7,6 @@ import axios from 'axios'
 
 import iView from 'iview'
 
-
 // import 'iview/dist/styles/iview.css'
 
 Vue.config.debug = true
@@ -17,9 +16,9 @@ Vue.prototype.$axios = axios
 Vue.use(iView)
 
 new Vue({
-  el: '#app',
-  router: router,
-  // store: store,
-  template: '<App/>',
-  components: { App }
+    el: '#app',
+    router: router,
+    // store: store,
+    template: '<App/>',
+    components: {App}
 })
