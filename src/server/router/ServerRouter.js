@@ -236,7 +236,7 @@ router.post('/recPay/139742685', function (req, res, next) {
     let real_price = req.body.real_price
     let signature = req.body.signature
 
-    // console.log(req.body)
+    console.log(req.body)
 
     if (!order_id){
         console.log(-997)
@@ -251,7 +251,7 @@ router.post('/recPay/139742685', function (req, res, next) {
 
     let info = pay_info(price,oData[0],oData[1])
 
-    console.log(signature,price,oData,info)
+    console.log(info)
 
     // if (info.signature!=signature){
     //     console.log(-1)

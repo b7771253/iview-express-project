@@ -91,7 +91,6 @@
                     <br>
 
 
-
                     <Button long type="success" :loading="saveLoading" @click="save()"> 提交</Button>
 
 
@@ -131,7 +130,7 @@
 
                         </Card>
 
-                        <Button v-show="showFlag" class="btn" type="primary" @click="showPay()">
+                        <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true">
                             阅读更多
                         </Button>
 
@@ -141,12 +140,13 @@
                                 title="請支持我們的網站，您的每一筆捐贈都會用於服務器建設"
                         >
                             <div class="title">
-                                    <img :src="payImg" style="width: 100%;"/>
+                                <img :src="payImg" style="width: 100%;"/>
                             </div>
 
                             <div slot="footer">
                                 <br>
-                                <Button type="success" size="large" long @click="modalFlag=false;getArticle">我已經支付</Button>
+                                <Button type="success" size="large" long @click="goPay()">前往支付
+                                </Button>
                                 <br>
                                 <br>
                                 <Button type="dashed" size="large" long @click="modalFlag=false">我沒有感情</Button>
@@ -187,7 +187,7 @@
                 isAdmin: 0,
                 payImg: "",
                 payData: {},
-                price:0,
+                price: 0,
             }
         },
         computed: {},
@@ -265,7 +265,7 @@
                     data1: this.data1,
                     data2: this.data2,
                     title: this.title,
-                    price:this.price,
+                    price: this.price,
                 })
                     .then(function (response) {
                         console.log(response);
@@ -296,21 +296,48 @@
                     });
 
             },
-            showPay: function () {
-                let v = this
-                this.$axios.post('/api/pay', this.payData)
-                    .then(function (response) {
-                        console.log(response);
-                        v.modalFlag = true
-                        v.payImg = response.data.info.qrcode
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+            goPay: function () {
+                Post("https://www.paypayzhu.com/api/pay",this.payData)
+                // let v = this
+                // this.$axios.post('/api/pay', this.payData)
+                //     .then(function (response) {
+                //         console.log(response);
+                //         v.modalFlag = true
+                //         v.payImg = response.data.info.qrcode
+                //     })
+                //     .catch(function (error) {
+                //         console.log(error);
+                //     });
 
-            }
+            },
+
 
         }
+    }
+
+    /*
+*功能： 模拟form表单的提交
+*参数： URL 跳转地址 PARAMTERS 参数
+*/
+    function Post(URL, PARAMTERS) {
+        //创建form表单
+        let temp_form = document.createElement("form");
+        temp_form.action = URL;
+        //如需打开新窗口，form的target属性要设置为'_blank'
+        temp_form.target = "_self";
+        temp_form.method = "post";
+        temp_form.style.display = "none";
+        //添加参数
+        for (let item in PARAMTERS) {
+            console.log(item)
+            let opt = document.createElement("textarea");
+            opt.name = item;
+            opt.value = PARAMTERS[item];
+            temp_form.appendChild(opt);
+        }
+        document.body.appendChild(temp_form);
+        //提交数据
+        temp_form.submit();
     }
 </script>
 
@@ -321,9 +348,11 @@
         justify-content: center;
         align-items: center;
     }
+
     .title img {
         width: 35%;
     }
+
     .layout {
         border: 1px solid #d7dde4;
         background: #f5f7f9;
