@@ -87,6 +87,14 @@
                     <i-input v-model="price"></i-input>
                     <br>
                     <br>
+
+                    <h3>隱藏方式 ： </h3>
+                    <Select long v-model="hideType"  style="width:200px" :on-change="test">
+                        <Option  :value="0">隱藏最後一張免費圖片</Option>
+                        <Option  :value="1">提示“查看種子文件”</Option>
+
+                    </Select>
+                    <br>
                     <br>
                     <br>
 
@@ -112,7 +120,7 @@
                             <div v-for="(item, index) in data1">
 
                                 <img v-if="item.type==1" :src="item.content" width="100%"
-                                     :class="(index==data1.length-1 && showFlag)?'bg-blur':''">
+                                     :class="(hideType==0&&index==data1.length-1 && showFlag)?'bg-blur':''">
 
                                 <h5 v-if="item.type==0">{{item.content}}</h5>
 
@@ -126,29 +134,38 @@
 
                                 <h5 v-if="item.type==0">{{item.content}}</h5>
 
+                                <div v-if="item.type==2" style="font-size: 0.75em">
+                                    <br>
+                                    <br>
+                                    下載地址：<a  :href="item.content" style="font-size: 0.75em;word-break:break-all ">{{item.content}}</a>
+                                </div>
+
+                            </div>
+
+                            <div v-show="hideType==1&&showFlag">
+                                <br>
+                                <Button long  size="large" type="primary" @click="modalFlag=true">
+                                    查看種子
+                                </Button>
                             </div>
 
                         </Card>
 
-                        <Button v-show="showFlag" class="btn" type="primary" @click="modalFlag=true">
+                        <Button v-show="hideType==0&&showFlag" class="btn" type="primary" @click="modalFlag=true">
                             阅读更多
                         </Button>
+
+
 
                         <Modal
                                 width="400px"
                                 v-model="modalFlag"
                                 title="請支持我們的網站，您的每一筆捐贈都會用於服務器建設"
                         >
-                            <div class="title">
-                                <img :src="payImg" style="width: 100%;"/>
-                            </div>
+                            <Button type="success" size="large" long @click="goPay()">前往支付
+                            </Button>
 
                             <div slot="footer">
-                                <br>
-                                <Button type="success" size="large" long @click="goPay()">前往支付
-                                </Button>
-                                <br>
-                                <br>
                                 <Button type="dashed" size="large" long @click="modalFlag=false">我沒有感情</Button>
                             </div>
                         </Modal>
@@ -181,6 +198,7 @@
                 title: "标题",
                 data1: [],
                 data2: [],
+                hideType:0,
                 showFlag: true,
                 modalFlag: false,
                 isEdit: false,
@@ -201,6 +219,9 @@
 
         },
         methods: {
+            test:function (val) {
+                console.log(val)
+            },
             getArticle: function () {
 
                 let v = this
@@ -228,6 +249,7 @@
                         v.data2 = response.data.data2
                         v.payData = response.data.sig
                         v.price = v.payData.price
+                        v.hideType = response.data.type
                         if (v.data2) {
                             v.showFlag = false
                         }
@@ -264,6 +286,7 @@
                     ua: this.ua,
                     data1: this.data1,
                     data2: this.data2,
+                    type:this.hideType,
                     title: this.title,
                     price: this.price,
                 })
@@ -298,17 +321,6 @@
             },
             goPay: function () {
                 Post("https://www.paypayzhu.com/api/pay",this.payData)
-                // let v = this
-                // this.$axios.post('/api/pay', this.payData)
-                //     .then(function (response) {
-                //         console.log(response);
-                //         v.modalFlag = true
-                //         v.payImg = response.data.info.qrcode
-                //     })
-                //     .catch(function (error) {
-                //         console.log(error);
-                //     });
-
             },
 
 

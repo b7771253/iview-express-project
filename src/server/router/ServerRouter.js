@@ -36,8 +36,11 @@ router.get('/getArticle', function (req, res, next) {
     let aid = parseInt(req.query.id)
     let ua = req.query.ua
 
+    let result = {}
+
     if (!aid || !ua || !(/^[0-9a-zA-Z]+$/.test(ua))) {
-        res.send({code: -1})
+        result.code = -1
+        res.send(result)
         return;
     }
 
@@ -47,7 +50,8 @@ router.get('/getArticle', function (req, res, next) {
 
             if (error || !results[0]) {
                 console.log(results, "============")
-                res.send({code: -1})
+                result.code = -1
+                res.send(result)
                 return;
             }
 
@@ -56,8 +60,13 @@ router.get('/getArticle', function (req, res, next) {
             if (!content) {
                 content = {data1: [], data2: []}
             }
-            let title = results[0].title
+
             let price = results[0].price
+
+            result = results[0]
+            result.content = null
+            result.data1 = content.data1
+            result.sig =  pay_info(price, ua, aid)
 
             let sql = 'SELECT ua,type FROM user where ua=?'
             let param = [ua]
@@ -65,20 +74,23 @@ router.get('/getArticle', function (req, res, next) {
             connection.query(sql, param, function (error, results) {
 
                 if (error) {
-                    res.send({code: -2, title: title, data1: content.data1,sig: pay_info(price, ua, aid)})
-                    return;
+                    result.code = -2
+                    res.send(result)
                 }
 
                 if (!results[0]) {
                     sql = 'INSERT INTO user VALUES(?,0)'
                     param = [ua]
                     connection.query(sql, param, null)
-                    res.send({code: -3, title: title, data1: content.data1, sig: pay_info(price, ua, aid)})
+                    result.code = -3
+                    res.send(result)
                     return
                 }
 
                 if (results[0].type == 99) {
-                    res.send({code: 99, title: title, data1: content.data1, data2: content.data2,sig: pay_info(price, ua, aid)})
+                    result.code = 99
+                    result.data2 = content.data2
+                    res.send(result)
                     return
                 }
 
@@ -92,12 +104,14 @@ router.get('/getArticle', function (req, res, next) {
                 connection.query(sql, param, function (error, results) {
 
                     if (error || !results[0] || !results[0].aid) {
-                        res.send({code: -5, title: title, data1: content.data1,sig: pay_info(price, ua, aid)})
+                        result.code = -5
+                        res.send(result)
                         return;
                     }
 
-                    res.send({code: 0, title: title, data1: content.data1, data2: content.data2, sig: pay_info(price, ua, aid)})
-
+                    result.code = 0
+                    result.data2 = content.data2
+                    res.send(result)
 
                 })
 
@@ -117,6 +131,7 @@ router.post('/saveArticle', function (req, res, next) {
     let price = req.body.price
     let data1 = req.body.data1
     let data2 = req.body.data2
+    let type = req.body.type
 
     let content = JSON.stringify({data1: data1, data2: data2})
 
@@ -133,7 +148,7 @@ router.post('/saveArticle', function (req, res, next) {
 
             console.log(ua, title, content,price)
 
-            connection.query("UPDATE article SET title=?,content=?,price=? WHERE id=?", [title, content,price,aid], function (error, results) {
+            connection.query("UPDATE article SET title=?,content=?,price=?,type=? WHERE id=?", [title, content,price,type,aid], function (error, results) {
                 if (error) {
                     res.send({code: -3})
                 } else {
